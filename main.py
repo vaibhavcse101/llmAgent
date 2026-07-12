@@ -4,12 +4,6 @@ from dotenv import load_dotenv
 
 # 1. ALWAYS load environment variables before importing modules that need them
 load_dotenv()
-
-# Example mock classes to prevent errors if you haven't split them into separate files yet
-class AIApplicationError(Exception): pass
-class APIConnectionTimeoutError(AIApplicationError): pass
-class ProviderRateLimitError(AIApplicationError): pass
-
 # Custom application imports
 from config import AppConfig
 import validators
@@ -42,7 +36,7 @@ def execute_model_call(task: str) -> str:
         
         # Stream evaluation block
         # FIX: Indented the entire block precisely to exactly 8 spaces inside the try-block
-        for part in client.chat('gpt-oss:120b', messages=messages, stream=True):
+        for part in client.chat(AppConfig.MODEL_TAG, messages=messages, stream=True):
             content = part['message']['content']
             print(content, end='', flush=True)
             full_response += content

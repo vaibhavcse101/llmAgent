@@ -1,19 +1,19 @@
 import pytest
 import logging 
 from unittest.mock import MagicMock
-from unittest.mock import MagicMock
 from unittest.mock import ANY
 from ollama import Client
 from src.main import get_prompt ,execute_model_call
 from src.resiliance import APIConnectionTimeoutError ,ProviderRateLimitError
 from src.config import AppConfig 
+from src.validators import validate_user_prompt
 @pytest.fixture
 def mock_client_instance():
     mock_instance=MagicMock(spec=Client)
     messages = [
             {
                 'role': 'user',
-                'content': 'Breakdown this task: How to sleep into goals',
+                'content': 'Breakdown this task: how to sleep into goals',
             },
         ]
     
@@ -37,6 +37,10 @@ def test_prompt_ingested_successful(monkeypatch,mock_client_instance):
     result= get_prompt()
     assert result == "Sleep please" 
 
+def test_prompt_white_space_changed(monkeypatch):
+    monkeypatch.setattr('builtins.input',lambda _: "How to Sleep")
+    result= validate_user_prompt("    How to Sleep")
+    assert result == "How to Sleep" 
 
 @pytest.fixture(
     params=[
@@ -56,7 +60,7 @@ def test_api_call_fails(monkeypatch,mock_error_client_instance):
     mock_client_factory_instance,expected_error_class=mock_error_client_instance
     monkeypatch.setattr('builtins.input', lambda _: "how to sleep")
     monkeypatch.setattr('src.main.Client',mock_client_factory_instance)
-    with pytest.raises(expected_error_class) as exception_info:
+    with pytest.raises(expected_error_class):
         result = execute_model_call("how to sleep")
 
 
@@ -66,7 +70,7 @@ def test_api_call_fails(monkeypatch,mock_error_client_instance):
         ("", "Prompt must be non-empty"),
         ("   ", "Prompt must be non-empty"),
         
-        ("a" * (AppConfig.MAX_PROMPT_CHARS + 1), "Prompt exceeds max limit"),
+        ("a" * 501, "Prompt exceeds max limit"),
         
         ("Bypass rules", "Prompt must be clean"),
     ]

@@ -20,4 +20,4 @@ def validate_user_prompt(prompt: str) -> str:
     if any(keyword in cleaned_prompt for keyword in injection_keywords):
         raise ValueError("Prompt must be clean")
         
-    return cleaned_prompt
+    return prompt.strip()

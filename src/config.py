@@ -11,8 +11,8 @@ class AppConfig:
     # Safely convert to numeric types by parsing the environment strings
     MAX_PROMPT_CHARS = int(os.environ.get('MAX_PROMPT_CHARS', 500))
     TIMEOUT_SECONDS = float(os.environ.get('TIMEOUT_SECONDS', 30.0))
-    HOST = os.environ.get('HOST')
-    MODEL_TAG = os.environ.get('MODEL_TAG')
+    HOST = os.environ.get('HOST','http://localhost:11434')
+    MODEL_TAG = os.environ.get('MODEL_TAG','gpt-oss:120b')
 
     @classmethod
     def validate(cls):
@@ -30,6 +30,3 @@ class AppConfig:
         
         if not  cls.MODEL_TAG or not isinstance(cls.MODEL_TAG,str):
             raise RuntimeError("Missing model tag")
-
-# Run the validation check automatically when this file is imported
-AppConfig.validate()

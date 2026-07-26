@@ -71,4 +71,6 @@ def get_prompt():
 
 
 if __name__ == "__main__":
+    AppConfig.validate()
     get_prompt()
+    
